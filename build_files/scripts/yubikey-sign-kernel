@@ -1,0 +1,19 @@
+#!/bin/bash
+# This script signs the EFI binaries using the Yubikey via PKCS#11
+
+# 1. Define variables (Update these to match your MOK cert location)
+CERT="/etc/pki/akmods/certs/public_key.der"
+# Find the kernel currently being prepared by ostree
+KERNEL_PATH=$(ls /boot/vmlinuz-* | head -n 1)
+
+echo ">>> Manual Secure Boot Signing Requested."
+echo ">>> Ensure Yubikey is inserted."
+
+# 2. Use sbsign with the OpenSC PKCS#11 engine
+# You will be prompted for your Yubikey User PIN here
+sbsign --key "pkcs11:token=Signature;object=SigningKey" \
+       --cert "$CERT" \
+       --output "$KERNEL_PATH" \
+       "$KERNEL_PATH"
+
+echo ">>> Signing complete."
