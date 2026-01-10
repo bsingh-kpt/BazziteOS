@@ -9,8 +9,8 @@ set -ouex pipefail
 # List of rpmfusion packages can be found here:
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
-# this installs a package from fedora repos
-#dnf5 install -y tmux
+# Enable COPR
+dnf5 -y copr enable ublue-os/staging
 
 ### 1. Install Packages
 dnf5 install -y \
@@ -19,10 +19,13 @@ dnf5 install -y \
     libfido2 \
     pam-u2f pamu2fcfg \
     sbsigntools \
-    cairo-dock
+    crystal-dock
+
+# Disable COPR
+dnf5 -y copr disable ublue-os/staging
 
 ### 2. Configure Yubikey for Sudo (PAM)
-#sed -i '1i auth sufficient pam_u2f.so cue' /etc/pam.d/sudo
+sed -i '3i auth       required     pam_u2f.so cue' /etc/pam.d/sudo
 
 ### 3. Disable Automatic Updates
 systemctl disable ublue-update.timer
@@ -31,6 +34,7 @@ systemctl mask ublue-update.service
 ### 4. Deploy KDE Layouts & Widgets
 mkdir -p /etc/skel/.config
 # Reference /ctx/ because that's where the bind mount is
+cp /ctx/config/starship.toml /etc/skel/.config/starship.toml
 cp /ctx/config/plasmashellrc /etc/skel/.config/plasmashellrc
 cp /ctx/config/appletrc /etc/skel/.config/plasma-org.kde.plasma.desktop-appletsrc
 
@@ -56,13 +60,43 @@ manual-update:
     echo "Update complete. Please reboot."
 EOF
 
-# Use a COPR Example:
-#
-# dnf5 -y copr enable ublue-os/staging
-# dnf5 -y install package
-# Disable COPRs so they don't end up enabled on the final image:
-# dnf5 -y copr disable ublue-os/staging
+# Install and default to starship prompt
+curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir /usr/bin/ -y
+cat << 'EOF' >> /etc/skel/.bashrc
+
+if [[ $- == *i* ]]
+then
+    fastfetch
+fi
+eval "$(starship init bash)"
+EOF
+
+### DELL test pc related only. REMOVE AFTER TESTING ###
+# Blacklist TPM modules to stop the 45s timeouts
+printf "blacklist tpm_tis\nblacklist tpm_crb\nblacklist tpm\n" > /etc/modprobe.d/blacklist-tpm.conf
+# Force dracut to omit TPM modules in the initramfs
+mkdir -p /usr/lib/dracut/dracut.conf.d && \
+    echo 'omit_dracutmodules+=" tpm2-tss "' > /usr/lib/dracut/dracut.conf.d/omit-tpm.conf
+systemctl mask dev-tpmrm0.device tpm2.target
+# Install xrdp
+dnf5 install -y xrdp
+systemctl enable xrdp
+cat << 'EOF' >> /usr/lib/firewalld/zones/public.xml
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+  <short>Public</short>
+  <description>For use in public areas.</description>
+  <service name="ssh"/>
+  <service name="dhcpv6-client"/>
+  <port port="3389" protocol="tcp"/>
+</zone>
+EOF
 
 #### Example for enabling a System Unit File
 
 systemctl enable podman.socket
+
+# Disable the automatic login to Gamescope/Steam
+# systemctl mask bazzite-user-setup.service && \
+#     systemctl disable bazzite-steam-setup.service && \
+#     rm -f /etc/sddm.conf.d/autologin.conf

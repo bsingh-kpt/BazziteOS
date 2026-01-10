@@ -112,7 +112,7 @@ jobs:
           arch: x86_64
           image_name: ${{ env.IMAGE_NAME }}
           image_repo: ${{ steps.registry_case.outputs.lowercase }}
-          variant: 'Kinoite'
+          variant: 'KDE'
           version: ${{ matrix.major_version }}
           image_tag: ${{ env.DEFAULT_TAG }}
           secure_boot_key_url: '${{ github.server_url }}/${{ github.repository_owner }}/bazzite/raw/main/secure_boot.der'
