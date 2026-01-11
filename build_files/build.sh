@@ -62,9 +62,9 @@ EOF
 
 ## bashrc modifications
 # Fixes flatpak apps KDE icons in crystal-dock
-# cat <<'EOF' >>/etc/profile.d/flatpak-exports.sh
-# export XDG_DATA_DIRS=$HOME/.local/share/applications:$XDG_DATA_DIRS
-# EOF
+cat <<'EOF' >>/etc/skel/.bashrc
+export XDG_DATA_DIRS="${HOME}/.local/share:$XDG_DATA_DIRS"
+EOF
 # Activate starship prompt
 # Make sure this is the lasts modidfication to bashrc
 cat <<'EOF' >>/etc/skel/.bashrc
