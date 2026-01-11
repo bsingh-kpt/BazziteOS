@@ -24,7 +24,7 @@ curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir /usr/bin/ -y
 
 ### SYSTEM CONFIGURATION SECTION - START ###
 # Configure Yubikey for Sudo (PAM)
-sed -i '3i auth       required     pam_u2f.so cue' /etc/pam.d/sudo
+# sed -i '3i auth       required     pam_u2f.so cue' /etc/pam.d/sudo
 
 ## System services
 systemctl enable podman.socket
@@ -62,7 +62,7 @@ EOF
 
 ## bashrc modifications
 # Fixes flatpak apps KDE icons in crystal-dock
-cat << 'EOF' >> /etc/profile.d/flatpak-exports.sh
+cat <<'EOF' >>/etc/profile.d/flatpak-exports.sh
 export XDG_DATA_DIRS=$HOME/.local/share/applications:$XDG_DATA_DIRS
 EOF
 # Activate starship prompt
@@ -75,7 +75,6 @@ then
 fi
 eval "$(starship init bash)"
 EOF
-
 ### SYSTEM CONF SECTION - END ###
 
 ### USER CONF SECTION - START ###
@@ -110,23 +109,23 @@ EOF
 ### POST INSTALL SECTION - END ###
 
 ### DELL test pc related only. REMOVE AFTER TESTING ### START
-# Blacklist TPM modules to stop the 45s timeouts
-printf "blacklist tpm_tis\nblacklist tpm_crb\nblacklist tpm\n" >/etc/modprobe.d/blacklist-tpm.conf
-# Force dracut to omit TPM modules in the initramfs
-mkdir -p /usr/lib/dracut/dracut.conf.d &&
-	echo 'omit_dracutmodules+=" tpm2-tss "' >/usr/lib/dracut/dracut.conf.d/omit-tpm.conf
-systemctl mask dev-tpmrm0.device tpm2.target
-# Install xrdp
-dnf5 install -y xrdp
-systemctl enable xrdp
-cat <<'EOF' >>/usr/lib/firewalld/zones/public.xml
-<?xml version="1.0" encoding="utf-8"?>
-<zone>
-  <short>Public</short>
-  <description>For use in public areas.</description>
-  <service name="ssh"/>
-  <service name="dhcpv6-client"/>
-  <port port="3389" protocol="tcp"/>
-</zone>
-EOF
+# # Blacklist TPM modules to stop the 45s timeouts
+# printf "blacklist tpm_tis\nblacklist tpm_crb\nblacklist tpm\n" >/etc/modprobe.d/blacklist-tpm.conf
+# # Force dracut to omit TPM modules in the initramfs
+# mkdir -p /usr/lib/dracut/dracut.conf.d &&
+# 	echo 'omit_dracutmodules+=" tpm2-tss "' >/usr/lib/dracut/dracut.conf.d/omit-tpm.conf
+# systemctl mask dev-tpmrm0.device tpm2.target
+# # Install xrdp
+# dnf5 install -y xrdp
+# systemctl enable xrdp
+# cat <<'EOF' >>/usr/lib/firewalld/zones/public.xml
+# <?xml version="1.0" encoding="utf-8"?>
+# <zone>
+#   <short>Public</short>
+#   <description>For use in public areas.</description>
+#   <service name="ssh"/>
+#   <service name="dhcpv6-client"/>
+#   <port port="3389" protocol="tcp"/>
+# </zone>
+# EOF
 ### DELL test pc related only. REMOVE AFTER TESTING ### END
