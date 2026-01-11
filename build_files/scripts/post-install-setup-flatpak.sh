@@ -9,11 +9,9 @@ fi
 # Most Flatpaks use the last part of their ID as the WMClass, but some (Brave/Firefox) are unique.
 APPS=(
 	"com.brave.Browser" "Brave Browser" "brave-browser"
-	"io.github.Tabby" "Tabby Terminal" "Tabby"
 	"org.mozilla.firefox" "Firefox" "firefox"
 	"org.keepassxc.KeePassXC" "KeePassXC" "KeePassXC"
 	"org.libreoffice.LibreOffice" "LibreOffice" "libreoffice-startcenter"
-	"vlc.VLC" "VLC Player" "vlc"
 	"org.wireshark.Wireshark" "Wireshark" "wireshark"
 	"dev.vencord.Vesktop" "Vesktop (Discord)" "vesktop"
 )

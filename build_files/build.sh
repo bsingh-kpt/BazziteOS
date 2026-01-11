@@ -13,6 +13,13 @@ dnf5 install -y \
 	sbsigntools \
 	crystal-dock
 
+dnf5 install -y \
+	vlc
+
+# Download and install tabby
+wget https://github.com/Eugeny/tabby/releases/download/v1.0.229/tabby-1.0.229-linux-x64.rpm -O /tmp/tabby-1.0.229-linux-x64.rpm
+dnf5 install -y /tmp/tabby-1.0.229-linux-x64.rpm
+
 # Disable COPR
 dnf5 -y copr disable ublue-os/staging
 
