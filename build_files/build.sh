@@ -24,7 +24,7 @@ curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir /usr/bin/ -y
 
 ### SYSTEM CONFIGURATION SECTION - START ###
 # Configure Yubikey for Sudo (PAM)
-# sed -i '3i auth       required     pam_u2f.so cue' /etc/pam.d/sudo
+sed -i '3i auth       required     pam_u2f.so cue' /etc/pam.d/sudo
 
 ## System services
 systemctl enable podman.socket
@@ -62,9 +62,9 @@ EOF
 
 ## bashrc modifications
 # Fixes flatpak apps KDE icons in crystal-dock
-cat <<'EOF' >>/etc/profile.d/flatpak-exports.sh
-export XDG_DATA_DIRS=$HOME/.local/share/applications:$XDG_DATA_DIRS
-EOF
+# cat <<'EOF' >>/etc/profile.d/flatpak-exports.sh
+# export XDG_DATA_DIRS=$HOME/.local/share/applications:$XDG_DATA_DIRS
+# EOF
 # Activate starship prompt
 # Make sure this is the lasts modidfication to bashrc
 cat <<'EOF' >>/etc/skel/.bashrc
