@@ -23,7 +23,7 @@ jobs:
 
       # 1. Download artifact from the previous workflow run
       - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: Build ISO
           run-id: ${{ github.event.workflow_run.id }}
