@@ -56,6 +56,7 @@ curl -Lo /etc/yum.repos.d/hardware:razer.repo https://openrazer.github.io/hardwa
 # Standard -dx tools minus the handheld overhead
 dnf5 install -y \
 	libcgroup \
+	docker-compose \
 	podman podman-docker podman-tui podman-machine \
 	git-delta \
 	neovim \

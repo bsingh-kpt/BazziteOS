@@ -35,7 +35,7 @@ on:
 env:
   IMAGE_NAME: ${{ github.event.repository.name }} # output of build.yml, keep in sync
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
-  DEFAULT_TAG: ${{ github.event.inputs.branch || github.ref_name }}
+  IMAGE_TAG: ${{ (github.event.inputs.branch || github.ref_name) == 'main' && 'latest' || (github.event.inputs.branch || github.ref_name) }}
   BIB_IMAGE: "quay.io/centos-bootc/bootc-image-builder:latest" # "quay.io/centos-bootc/bootc-image-builder:latest" - see https://github.com/osbuild/bootc-image-builder/pull/954
 
 concurrency:
@@ -118,10 +118,10 @@ jobs:
           image_repo: ${{ steps.registry_case.outputs.lowercase }}
           variant: 'KDE'
           version: ${{ matrix.major_version }}
-          image_tag: ${{ env.DEFAULT_TAG }}
+          image_tag: ${{ env.IMAGE_TAG }}
           secure_boot_key_url: '${{ github.server_url }}/${{ github.repository_owner }}/bazzite/raw/main/secure_boot.der'
           enrollment_password: 'universalblue'
-          iso_name: ${{ env.IMAGE_NAME }}-${{ env.DEFAULT_TAG }}-${{ inputs.platform || 'amd64' }}.iso
+          iso_name: ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}-${{ inputs.platform || 'amd64' }}.iso
           enable_cache_dnf: "false"
           enable_cache_skopeo: "false"
           # flatpak_remote_refs_dir: ${{ steps.generate-flatpak-dir-shortname.outputs.flatpak-dir-shortname }}
@@ -137,7 +137,7 @@ jobs:
       #   with:
       #     builder-image: ${{ env.BIB_IMAGE }}
       #     config-file: ${{ matrix.disk-type == 'anaconda-iso' && './disk_config/iso.toml' || './disk_config/disk.toml' }}
-      #     image: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}
+      #     image: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
       #     chown: ${{ env.USER_UID }}:${{ env.USER_GID }}
       #     types: ${{ matrix.disk-type }}
       #     additional-args: --use-librepo=True --rootfs btrfs
@@ -146,10 +146,10 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: build-iso-${{ env.DEFAULT_TAG }}
+          name: build-iso-${{ env.IMAGE_TAG }}
           path: |
-            ${{ env.IMAGE_NAME }}-${{ env.DEFAULT_TAG }}-${{ inputs.platform || 'amd64' }}.iso
-            ${{ env.IMAGE_NAME }}-${{ env.DEFAULT_TAG }}-${{ inputs.platform || 'amd64' }}.iso-CHECKSUM
+            ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}-${{ inputs.platform || 'amd64' }}.iso
+            ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}-${{ inputs.platform || 'amd64' }}.iso-CHECKSUM
           if-no-files-found: error
           retention-days: 10
           compression-level: 0
