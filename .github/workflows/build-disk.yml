@@ -30,14 +30,14 @@ on:
     branches:
       - stable
     paths:
-      - './disk_config/disk.toml'
-      - './disk_config/iso.toml'
-      - './.github/workflows/build-disk.yml'
+      - "./disk_config/disk.toml"
+      - "./disk_config/iso.toml"
+      - "./.github/workflows/build-disk.yml"
 
 env:
-  IMAGE_NAME: ${{ github.event.repository.name }} # output of build.yml, keep in sync
-  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
-  # Logic: 
+  IMAGE_NAME: ${{ github.event.repository.name }}
+  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
+  # Logic:
   # 1. If triggered by another workflow, check THAT workflow's event type
   # 2. If it was a PR, use pr-<number>
   # 3. If it was a push to main, use latest
@@ -57,8 +57,8 @@ concurrency:
 jobs:
   build:
     name: Build disk images
-    runs-on: ubuntu-24.04
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -100,10 +100,10 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
-      
+
       - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request' &&  && github.event.workflow_run.event != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -129,11 +129,11 @@ jobs:
           arch: x86_64
           image_name: ${{ env.IMAGE_NAME }}
           image_repo: ${{ steps.registry_case.outputs.lowercase }}
-          variant: 'KDE'
+          variant: "KDE"
           version: ${{ matrix.major_version }}
           image_tag: ${{ env.IMAGE_TAG }}
-          secure_boot_key_url: '${{ github.server_url }}/${{ github.repository_owner }}/bazzite/raw/main/secure_boot.der'
-          enrollment_password: 'universalblue'
+          secure_boot_key_url: "${{ github.server_url }}/${{ github.repository_owner }}/bazzite/raw/main/secure_boot.der"
+          enrollment_password: "universalblue"
           iso_name: ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}-${{ inputs.platform || 'amd64' }}.iso
           enable_cache_dnf: "false"
           enable_cache_skopeo: "false"
@@ -142,7 +142,6 @@ jobs:
           extra_boot_params: ${{ steps.generate-extra-params.outputs.extra-boot-params }}
           # additional_templates: '/github/workspace/installer/lorax_templates/remove_root_password_prompt.tmpl /github/workspace/installer/lorax_templates/set_default_user.tmpl'
           # repos: '/github/workspace/bazzite.repo /etc/yum.repos.d/fedora.repo /etc/yum.repos.d/fedora-updates.repo'
-
 
       # - name: Build disk images
       #   id: build
@@ -156,7 +155,7 @@ jobs:
       #     additional-args: --use-librepo=True --rootfs btrfs
 
       - name: Upload disk images and Checksum to Job Artifacts
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.event.workflow_run.event != 'pull_request'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: build-iso-${{ env.IMAGE_TAG }}
@@ -166,4 +165,3 @@ jobs:
           if-no-files-found: error
           retention-days: 10
           compression-level: 0
-

@@ -40,10 +40,13 @@ jobs:
         with:
           workflow: "Build disk images"
           name: build-iso-stable
-          # branch: ${{ github.event.inputs.branch || github.event.workflow_run.head_branch }}
-          branch: stable
+          # If triggered by workflow_run, use that specific ID. 
+          # If manual, search the 'stable' branch for the latest success.
           run_id: ${{ github.event.workflow_run.id || '' }}
+          branch: ${{ github.event_name == 'workflow_dispatch' && 'stable' || '' }}
           workflow_conclusion: success
+          check_artifacts: true
+          search_artifacts: true
 
       - name: Process ISO
         id: process

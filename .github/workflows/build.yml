@@ -92,7 +92,7 @@ jobs:
           tags: |
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=raw,value=stable,enable=${{ github.ref == 'refs/heads/stable' }}
-            type=raw,value=${{ env.IMAGE_TAG }}.{{date 'YYYYMMDD'}},enable=${{ github.base_ref == 'main' || github.ref == 'stable' }}
+            type=raw,value=${{ env.IMAGE_TAG }}.{{date 'YYYYMMDD'}},enable=${{ github.ref_name == 'main' || github.ref_name == 'stable' }}
             type=sha,enable=${{ github.event_name == 'pull_request' }}
             type=ref,event=pr
             type=ref,event=branch,enable=${{ startsWith(github.ref, 'refs/heads/feature/') }}
