@@ -17,6 +17,10 @@ on:
         description: "Release Tag (e.g. v1.2.3)"
         required: true
         type: string
+      run_id:
+        description: "Run ID of the Build disk images workflow (leave blank for latest)"
+        required: false
+        type: string
       upload_to_s3:
         description: "Upload to S3 instead of splitting"
         required: false
@@ -40,10 +44,12 @@ jobs:
         with:
           workflow: "Build disk images"
           name: build-iso-stable
-          # If triggered by workflow_run, use that specific ID. 
-          # If manual, search the 'stable' branch for the latest success.
-          run_id: ${{ github.event.workflow_run.id || '' }}
-          branch: ${{ github.event_name == 'workflow_dispatch' && 'stable' || '' }}
+          # Order of priority: 
+          # 1. Manual Run ID input
+          # 2. Automated workflow_run ID
+          # 3. If neither, it searches the branch
+          run_id: ${{ github.event.inputs.run_id || github.event.workflow_run.id || '' }}
+          branch: ${{ (github.event.inputs.run_id || github.event.workflow_run.id) && '' || 'stable' }}
           workflow_conclusion: success
           check_artifacts: true
           search_artifacts: true
