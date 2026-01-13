@@ -89,10 +89,10 @@ jobs:
           files: |
             *.part-*
             *-CHECKSUM
-            ${{ steps.process.outputs.mode == 's3' && '' || '*.iso' }}
+            ${{ steps.process.outputs.mode == 'split' && '' || '*.iso' }}
 
       - name: Cleanup
-        if: always()
+        if: success()
         uses: geekyeggo/delete-artifact@v5
         with:
           name: build-iso-stable
