@@ -43,16 +43,14 @@ jobs:
         uses: dawidd6/action-download-artifact@v3
         with:
           workflow: "Build disk images"
-          name: build-iso-stable
-          # Order of priority: 
-          # 1. Manual Run ID input
-          # 2. Automated workflow_run ID
-          # 3. If neither, it searches the branch
-          run_id: ${{ github.event.inputs.run_id || github.event.workflow_run.id || '' }}
-          branch: ${{ (github.event.inputs.run_id || github.event.workflow_run.id) && '' || 'stable' }}
           workflow_conclusion: success
-          check_artifacts: true
-          search_artifacts: true
+          # Use the Run ID if we have one (from PR/Workflow_run or Manual Input)
+          run_id: ${{ github.event.inputs.run_id || github.event.workflow_run.id || '' }}
+          # ONLY provide the branch name if we DON'T have a Run ID
+          branch: ${{ (github.event.inputs.run_id || github.event.workflow_run.id) == '' && 'stable' || '' }}
+          # This helps the action handle the "Found multiple" or "API delay" issues
+          search_artifacts: true 
+          if_no_artifact_found: error
 
       - name: Process ISO
         id: process
