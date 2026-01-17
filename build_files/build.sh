@@ -170,7 +170,7 @@ chmod +x /usr/bin/post-install-setup
 cat <<'EOF' >/etc/xdg/autostart/trigger-post-install.desktop
 [Desktop Entry]
 Name=Initial Software Setup
-Exec=/usr/bin/post-install-setup
+Exec=sleep 10 && /usr/bin/post-install-setup
 Type=Application
 Terminal=false
 X-KDE-autostart-after=panel
