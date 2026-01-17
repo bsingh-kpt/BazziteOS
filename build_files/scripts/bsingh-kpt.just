@@ -34,7 +34,7 @@ manual-update:
 
 # Enroll Yubikey FIDO2 PAM keys (pam_u2f)
 [group('bsingh-customizations')]
-enroll-fido2=keys:
+enroll-fido2-keys:
     #!/usr/bin/bash
     set -eo pipefail
     if [ -f /etc/Yubico/u2f_keys ]; then
@@ -45,13 +45,14 @@ enroll-fido2=keys:
     pam 
 
 # Setup Yubikey FIDO MFA auth for sudo
-[group('bsingh-customizations')]
-setup-mfa-sudo: (_setup_fido2_yubikey "sudo")
+#[group('bsingh-customizations')]
+#setup-mfa-sudo: (_setup_fido2_yubikey "sudo")
 
 # Setup Yubikey FIDO MFA auth for sudo
 [group('bsingh-customizations')]
 setup-fido2-mfa ACTION="":
     #!/usr/bin/bash
+    set -eo pipefail
     source /usr/lib/ujust/ujust.sh
     if [[ $(id -u) -eq 0 ]]; then
       echo "Please do not run this command as root"
@@ -70,13 +71,12 @@ setup-fido2-mfa ACTION="":
       exit 0
     elif [ "$OPTION" == "" ]; then
       echo "${bold}FIDO2 MFA Setup${normal}"
-      echo "WARNING: Enabling MFA for sudo or polkit will then require FIDO2 key be present."
-      echo "         This can lock sudo command. You'll need live USB boot to undo the changes."
+      echo ""
       OPTION=$(Choose \
         "Enroll FIDO2 key for $USER" \
         "Enroll additional FIDO2 key for $USER" \
         "Enable sudo FIDO2 MFA" \
-        "Disable sudo FIDO2 MFA"
+        "Disable sudo FIDO2 MFA" \
         "Enable polkit FIDO2 MFA" \
         "Disable polkit FIDO2 MFA" \
       )
@@ -99,14 +99,44 @@ setup-fido2-mfa ACTION="":
         fi
         pamu2fcfg -o pam://bsingh-kpt -i pam://bsingh-kpt -n >> /home/$USER/.config/Yubico/u2f_keys
     elif [[ "${OPTION,,}" =~ (^enable[[:space:]]sudo|enable-mfa-sudo) ]]; then
-        echo "Enabling MFA for sudo"
-        sudo cp -f /usr/share/bsingh-kpt/pam.d/sudo /etc/pam.d/sudo
+        echo "${yellow}${bold}!!! WARNING !!!${normal}"
+        echo "${yellow}This recipe will proceed to ${bold}enable MFA for sudo.${normal}"
+        echo "${yellow}Enabling MFA for sudo or polkit will then require FIDO2 key (Yubikey) be present.${normal}"
+        echo "${yellow}This can ${bold}lock sudo command.${normal}${yellow} You'll need sudo or live USB boot to undo the changes.${normal}"
+        echo ""
+        echo "Are you sure you want to continue?"
+        OPTION=$(Choose "Proceed" "Quit")
+        case "$OPTION" in
+          Proceed|proceed)
+            echo "Enabling MFA for sudo..."
+            sudo cp -f /usr/share/bsingh-kpt/pam.d/sudo /etc/pam.d/sudo
+            ;;
+          *)
+            echo "Aborting..."
+            exit 0
+            ;;
+        esac
     elif [[ "${OPTION,,}" =~ (^disable[[:space:]]sudo|disable-mfa-sudo) ]]; then
         echo "Disabling MFA for sudo"
         sudo cp -f /usr/etc/pam.d/sudo /etc/pam.d/sudo
     elif [[ "${OPTION,,}" =~ (^enable[[:space:]]polkit|enable-mfa-polkit) ]]; then
-        echo "Enabling MFA for polkit"
-        sudo cp -f /usr/share/bsingh-kpt/pam.d/polkit-1 /etc/pam.d/polkit-1
+        echo "${yellow}${bold}!!! WARNING !!!${normal}"
+        echo "${yellow}This recipe will proceed to ${bold}enable MFA for polkit (GUI prompts).${normal}"
+        echo "${yellow}Enabling MFA for sudo or polkit will then require FIDO2 key (Yubikey) be present.${normal}"
+        echo "${yellow}This can cause ${bold}failed polkit password prompts.${normal}${yellow} You'll need live USB boot to undo the changes.${normal}"
+        echo ""
+        echo "Are you sure you want to continue?"
+        OPTION=$(Choose "Proceed" "Quit")
+        case "$OPTION" in
+          Proceed|proceed)
+            echo "Enabling MFA for polkit..."
+            sudo cp -f /usr/share/bsingh-kpt/pam.d/polkit-1 /etc/pam.d/polkit-1
+            ;;
+          *)
+            echo "Aborting..."
+            exit 0
+            ;;
+        esac
     elif [[ "${OPTION,,}" =~ (^disable[[:space:]]polkit|disable-mfa-polkit) ]]; then
         echo "Disabling MFA for polkit"
         sudo rm -f /etc/pam.d/polkit-1
