@@ -4,7 +4,9 @@ name: Build container image
 on:
   pull_request:
     branches:
-      - main
+      # Temporarily stop pull container build on pull request for main
+      # Testing build-disk.yaml steps
+      # - main
       - stable
   schedule:
     - cron: "05 10 * * *" # 10:05am UTC everyday

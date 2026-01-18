@@ -6,6 +6,11 @@ permissions:
   packages: read
 
 on:
+  # Temporarily enable ISO build push for workflow_improvement
+  # Testing some build steps
+  push:
+    branches:
+      - workflow_improvement
   workflow_run:
     workflows: ["Build container image"]
     types:
@@ -58,7 +63,7 @@ concurrency:
 jobs:
   build:
     name: Build disk images
-    if: ${{ (github.event.workflow_run.conclusion == 'success' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'))  || github.event_name == 'workflow_dispatch' }}
+    # if: ${{ (github.event.workflow_run.conclusion == 'success' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'))  || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -123,6 +128,14 @@ jobs:
         with:
           string: ${{ env.IMAGE_REGISTRY }}
 
+      - name: Create File
+        id: create_file
+        run: |
+          set -x
+          ls -la /
+          cat "Testdata" > /testiso.iso
+          sha256sum /testiso.iso > /testiso.iso-CHECKSUM
+
       - name: Build ISO
         uses: jasonn3/build-container-installer@c9ef3de33236e66781ec37bd0485e8009eaefe24 # v1.4.0
         id: build
@@ -166,3 +179,20 @@ jobs:
           if-no-files-found: error
           retention-days: 10
           compression-level: 0
+
+      - name: Cleanup
+        if: success()
+        run: |
+          set -x
+          ls -la /
+          # Find the artifact ID by name and delete it
+          ARTIFACT_ID=$(gh api repos/${{ github.repository }}/actions/artifacts?name=build-iso-stable --jq '.artifacts[0].id')
+
+          if [ ! -z "$ARTIFACT_ID" ] && [ "$ARTIFACT_ID" != "null" ]; then
+            echo "Deleting artifact ID: $ARTIFACT_ID"
+            gh api --method DELETE repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID
+          else
+            echo "No artifact found with name 'build-iso-stable'. Skipping cleanup."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
