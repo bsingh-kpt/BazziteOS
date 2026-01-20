@@ -16,19 +16,13 @@ jobs:
       - name: Delete images older than 30 days and untagged
         uses: snok/container-retention-policy@v3.0.0
         with:
-          # Your GitHub token (automatically provided)
           token: ${{ secrets.GITHUB_TOKEN }}
-          
-          # Target your specific image name
+          account: user
           image-names: 'bazziteos'
           
-          # Filter: Delete versions older than 30 days
-          cut-off: 30d
-          
-          # Specifically protects tags matching a pattern (e.g., semver like v1.0.0)
-          # This ensures your official releases are never auto-deleted
-          filter-tags: '^v\d+\.\d+\.\d+$'
-          filter-include-untagged: true
-          
-          # Set to 'false' to actually perform deletion; 'true' just logs what would happen
+          # Delete versions older than 20 days
+          cut-off: 20d
           dry-run: false
+
+          # Filter out important tags
+          image-tags: "!latest* !stable* !v*"
