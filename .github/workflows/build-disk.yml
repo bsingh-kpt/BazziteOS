@@ -28,7 +28,6 @@ on:
           - amd64
   pull_request:
     branches:
-      - main
       - stable
     paths:
       - "./disk_config/disk.toml"
@@ -52,13 +51,13 @@ env:
   BIB_IMAGE: "quay.io/centos-bootc/bootc-image-builder:latest" # "quay.io/centos-bootc/bootc-image-builder:latest" - see https://github.com/osbuild/bootc-image-builder/pull/954
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   build:
     name: Build disk images
-    if: ${{ (github.event.workflow_run.conclusion == 'success' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'))  || github.event_name == 'workflow_dispatch' }}
+    if: github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/stable'  || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
