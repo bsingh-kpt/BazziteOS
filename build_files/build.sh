@@ -64,48 +64,14 @@ dnf5 install -y \
 	ckb-next polychromatic \
 	openrazer-meta openrazer-daemon \
 	brave-browser \
-	keepassxc
-
-# Additional SW
-dnf5 install -y \
+	keepassxc \
 	yubikey-manager yubico-piv-tool pam_yubico \
 	yubikey-manager-qt yubikey-personalization-gui \
 	opensc \
 	libfido2 \
 	pam-u2f pamu2fcfg \
-	sbsigntools
-
-dnf5 install -y \
+	sbsigntools \
 	vlc
-
-# Instal VS Code
-wget "https://code.visualstudio.com/sha/download?build=stable&os=linux-rpm-x64" -O /tmp/vscode-latest.rpm
-dnf5 install -y /tmp/vscode-latest.rpm
-rm -f /tmp/vscode-latest.rpm
-
-# Install Tabby
-wget https://github.com/Eugeny/tabby/releases/download/v$TABBY_VERSION/tabby-$TABBY_VERSION-linux-x64.rpm -O /tmp/tabby-$TABBY_VERSION-linux-x64.rpm
-dnf5 install -y /tmp/tabby-$TABBY_VERSION-linux-x64.rpm
-rm -f /tmp/tabby-$TABBY_VERSION-linux-x64.rpm
-
-# Install ProtonMail
-wget https://proton.me/download/mail/linux/$PROTONMAL_VERSION/ProtonMail-desktop-beta.rpm -O /tmp/ProtonMail-desktop-beta.rpm
-dnf5 install -y /tmp/ProtonMail-desktop-beta.rpm
-rm -f /tmp/ProtonMail-desktop-beta.rpm
-
-# Disable COPR
-# dnf5 -y copr disable ublue-os/staging
-
-## Non dnf installations
-# Install Yubico Authenticator
-wget https://developers.yubico.com/yubioath-flutter/Releases/yubico-authenticator-$YUBICO_AUTHENTICATOR_VERSION-linux.tar.gz -O /tmp/yubico-authenticator-$YUBICO_AUTHENTICATOR_VERSION-linux.tar.gz
-tar -xvf /tmp/yubico-authenticator-$YUBICO_AUTHENTICATOR_VERSION-linux.tar.gz -C /opt/
-rm -f /tmp/yubico-authenticator-$YUBICO_AUTHENTICATOR_VERSION-linux.tar.gz
-sed -e "s|@EXEC_PATH|/opt/yubico-authenticator-$YUBICO_AUTHENTICATOR_VERSION-linux|g" \
-	<"/opt/yubico-authenticator-$YUBICO_AUTHENTICATOR_VERSION-linux/linux_support/com.yubico.yubioath.desktop" \
-	>"/usr/share/applications/com.yubico.yubioath.desktop"
-# Install Starship
-curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir /usr/bin/ -y
 
 ### INSTALL PACKAGES SECTION - END ###
 
