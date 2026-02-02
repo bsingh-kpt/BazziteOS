@@ -51,12 +51,13 @@ EOF
 ### INSTALL PACKAGES SECTION - START ###
 # Enable COPR
 # dnf5 -y copr enable ublue-os/staging
-curl -Lo /etc/yum.repos.d/hardware:razer.repo https://openrazer.github.io/hardware:razer.repo
+curl -fsSLo /etc/yum.repos.d/hardware:razer.repo https://openrazer.github.io/hardware:razer.repo
 curl -fsSLo /etc/yum.repos.d/brave-browser.repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
 
 # Standard -dx tools minus the handheld overhead
 dnf5 install -y \
 	systemd-ukify \
+	konsole \
 	libcgroup \
 	docker-compose \
 	podman podman-docker podman-tui podman-machine \
@@ -71,8 +72,7 @@ dnf5 install -y \
 	opensc \
 	libfido2 \
 	pam-u2f pamu2fcfg \
-	sbsigntools \
-	vlc
+	sbsigntools
 
 ### INSTALL PACKAGES SECTION - END ###
 
