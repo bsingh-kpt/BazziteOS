@@ -9,6 +9,7 @@ fi
 APPS=(
 	"Flatseal" "com.github.tchx84.Flatseal"
 	"Firefox" "org.mozilla.firefox"
+	"VLC" "org.videolan.VLC"
 	"Image Viewer" "org.gnome.Loupe"
 	"LibreOffice" "org.libreoffice.LibreOffice"
 	"Vesktop (Discord)" "dev.vencord.Vesktop"

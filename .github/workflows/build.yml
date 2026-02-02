@@ -7,7 +7,7 @@ on:
       - main
       - stable
   schedule:
-    - cron: "05 10 * * *" # 10:05am UTC everyday
+    - cron: '05 10 * * 0' # 10:05am UTC on Sunday
   push:
     tags:
       - "v*"
