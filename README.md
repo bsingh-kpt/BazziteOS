@@ -1,4 +1,6 @@
-# 🌑 Deimos OS
+# 🌑 Deimos
+
+### This is a WIP.
 
 **Verified. Private. Authenticated.** *A Bazzite-based gaming OS featuring a hardware-verified boot chain.*
 
